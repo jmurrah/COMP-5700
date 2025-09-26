@@ -1,11 +1,9 @@
-"""Unit tests for exercise4 cryptography violation detection utilities."""
-from __future__ import annotations
-
 from pathlib import Path
 
 import pytest
 
 from exercise4 import (
+    INTERESTING_TERMS,
     analyze_requirements,
     extract_security_clauses,
     lookup_principle_violations,
@@ -18,9 +16,9 @@ from exercise4 import (
 # -----------------------------
 def test_parse_requirements_yaml_reads_entries(tmp_path: Path) -> None:
     sample = (
-        "- ALL: \"context\"\n"
-        "  R1: \"Use MD5 for passwords.\"\n"
-        "  R2: \"Rotate keys quarterly.\"\n"
+        '- ALL: "context"\n'
+        '  R1: "Use MD5 for passwords."\n'
+        '  R2: "Rotate keys quarterly."\n'
     )
     req_file = tmp_path / "requirements.yaml"
     req_file.write_text(sample, encoding="utf-8")
@@ -34,10 +32,7 @@ def test_parse_requirements_yaml_reads_entries(tmp_path: Path) -> None:
 
 
 def test_parse_requirements_yaml_ignores_all_key(tmp_path: Path) -> None:
-    sample = (
-        "- ALL: \"overview\"\n"
-        "  R1: \"Requirement text\"\n"
-    )
+    sample = '- ALL: "overview"\n' '  R1: "Requirement text"\n'
     req_file = tmp_path / "req.yaml"
     req_file.write_text(sample, encoding="utf-8")
 
@@ -49,9 +44,9 @@ def test_parse_requirements_yaml_ignores_all_key(tmp_path: Path) -> None:
 
 def test_parse_requirements_yaml_supports_compact_format(tmp_path: Path) -> None:
     sample = (
-        "- ALL:\"context\"\n"
-        "  R1:\"Use MD5 for passwords.\"\n"
-        "  R2:\"Rotate keys quarterly.\"\n"
+        '- ALL:"context"\n'
+        '  R1:"Use MD5 for passwords."\n'
+        '  R2:"Rotate keys quarterly."\n'
     )
     req_file = tmp_path / "req.yaml"
     req_file.write_text(sample, encoding="utf-8")
@@ -96,13 +91,13 @@ def test_parse_requirements_yaml_rejects_non_string_values(tmp_path: Path) -> No
 # -----------------------------------------
 def test_extract_security_clauses_identifies_keyword_clause() -> None:
     text = "We will use MD5 for hashes. Keys rotate annually."
-    clauses = extract_security_clauses(text)
+    clauses = extract_security_clauses(text, list(INTERESTING_TERMS))
     assert "We will use MD5 for hashes." in clauses
 
 
 def test_extract_security_clauses_handles_multiple_sentences() -> None:
     text = "Random numbers come from a fixed range; custom algorithm ensures speed."
-    clauses = extract_security_clauses(text)
+    clauses = extract_security_clauses(text, list(INTERESTING_TERMS))
     assert len(clauses) == 2
 
 
@@ -114,12 +109,12 @@ def test_extract_security_clauses_supports_custom_terms() -> None:
 
 def test_extract_security_clauses_returns_full_text_when_no_terms() -> None:
     text = "Performance requirements are pending."
-    clauses = extract_security_clauses(text)
+    clauses = extract_security_clauses(text, list(INTERESTING_TERMS))
     assert clauses == [text]
 
 
 def test_extract_security_clauses_returns_empty_for_empty_text() -> None:
-    assert extract_security_clauses("") == []
+    assert extract_security_clauses("", list(INTERESTING_TERMS)) == []
 
 
 # ---------------------------------------------------
@@ -165,9 +160,9 @@ def test_lookup_principle_violations_returns_empty_when_clean() -> None:
 # ----------------------
 def test_analyze_requirements_combines_helpers(tmp_path: Path) -> None:
     yaml_text = (
-        "- ALL: \"context\"\n"
-        "  R1: \"Store passwords with MD5.\"\n"
-        "  R2: \"Random numbers come from a fixed range.\"\n"
+        '- ALL: "context"\n'
+        '  R1: "Store passwords with MD5."\n'
+        '  R2: "Random numbers come from a fixed range."\n'
     )
     req_file = tmp_path / "req.yaml"
     req_file.write_text(yaml_text, encoding="utf-8")
