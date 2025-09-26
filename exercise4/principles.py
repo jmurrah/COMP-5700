@@ -1,3 +1,9 @@
+"""
+COMP-5700 Exercise 4: IEEE Secure Design Principles (Principles Context)
+Author: Jacob Murrah
+Date: 09/26/2025
+"""
+
 PRINCIPLES = {
     "TRUE_RANDOMNESS": [
         {

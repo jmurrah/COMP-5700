@@ -1,44 +1,73 @@
+"""
+COMP-5700 Exercise 4: IEEE Secure Design Principles (Program Code)
+Author: Jacob Murrah
+Date: 09/26/2025
+"""
+
 from collections import defaultdict
 from pathlib import Path
 
 import re
-
-import torch
-
 import yaml
-from transformers import pipeline
-
 
 from principles import PRINCIPLES
 
-INTERESTING_TERMS = {
+TERMS = {
     "encrypt",
+    "encryption",
+    "decrypt",
+    "cipher",
+    "ciphertext",
+    "plaintext",
     "hash",
+    "hashing",
+    "digest",
     "md5",
     "sha",
+    "sha256",
+    "sha512",
+    "bcrypt",
+    "scrypt",
+    "argon2",
+    "rsa",
+    "aes",
+    "ecb",
+    "cbc",
+    "gcm",
+    "mac",
+    "hmac",
+    "signature",
+    "signing",
+    "certificate",
+    "tls",
     "random",
     "range",
     "seed",
     "nonce",
+    "iv",
+    "entropy",
     "algorithm",
     "implementation",
     "custom",
     "own",
+    "proprietary",
+    "variant",
     "rotate",
+    "rotation",
     "key",
+    "keys",
+    "token",
+    "secret",
+    "credential",
+    "kdf",
+    "keystore",
+    "vault",
+    "policy",
 }
-
-NLP_SCORE_THRESHOLD = 0.45
-ZERO_SHOT_CLASSIFIER = pipeline(
-    "zero-shot-classification",
-    model="jackaduma/SecBERT",
-    tokenizer="jackaduma/SecBERT",
-    device=0 if torch.cuda.is_available() else -1,
-)
 
 
 # -------------------------
-# (T1) YAML parsing helpers
+# (T1) include a method/function to parse the YAML content
 # -------------------------
 def parse_requirements_yaml(path: str) -> dict[str, str]:
     """Parse the exercise requirements YAML into a mapping of IDs to statements."""
@@ -84,7 +113,7 @@ def parse_requirements_yaml(path: str) -> dict[str, str]:
 
 
 # ------------------------------------------------------
-# (T2) Content extraction for potential policy violations
+# (T2) include at least one method/function that performs content extraction related to policy violations
 # ------------------------------------------------------
 def extract_security_clauses(requirement_text: str, terms: list[str]) -> list[str]:
     """Return clauses that contain terms suggesting cryptography policy decisions."""
@@ -116,7 +145,7 @@ def extract_security_clauses(requirement_text: str, terms: list[str]) -> list[st
 
 
 # ------------------------------------------------------------------
-# (T3) Key-value based lookup against the secure design principles map
+# (T3) include at least one method/function that performs a key-value based lookup operation to determine violations of the principles
 # ------------------------------------------------------------------
 def lookup_principle_violations(
     requirement_text: str,
@@ -128,38 +157,29 @@ def lookup_principle_violations(
     matches = defaultdict(set)
 
     for principle, violation_entries in principles.items():
-        candidate_labels = []
         for entry in violation_entries:
             violation = entry["violation"].strip()
             keywords = entry["keywords"]
-            candidate_labels.append(violation)
             if any(keyword.lower() in text_lower for keyword in keywords):
                 matches[principle].add(violation)
-
-        if candidate_labels:
-            result = ZERO_SHOT_CLASSIFIER(
-                requirement_text,
-                candidate_labels=candidate_labels,
-                multi_label=True,
-            )
-            for label, score in zip(result["labels"], result["scores"]):
-                if score >= NLP_SCORE_THRESHOLD:
-                    matches[principle].add(label)
 
     return {principle: sorted(violations) for principle, violations in matches.items()}
 
 
-# ------------------------
-# Analysis and formatting
-# ------------------------
 def analyze_requirements(
     requirements: dict[str, str]
 ) -> dict[str, dict[str, dict[str]]]:
     """Combine clause extraction and principle lookup for each requirement."""
     analysis = {}
     for req_id, text in requirements.items():
-        clauses = extract_security_clauses(text, list(INTERESTING_TERMS))
-        violations = lookup_principle_violations(text, PRINCIPLES)
+        clauses = extract_security_clauses(
+            text, list(TERMS)
+        )  # (T2) include at least one method/function that performs content extraction related to policy violations
+
+        violations = lookup_principle_violations(
+            text, PRINCIPLES
+        )  # (T3) include at least one method/function that performs a key-value based lookup operation to determine violations of the principles
+
         analysis[req_id] = {
             "clauses": clauses,
             "violations": violations,
@@ -173,36 +193,59 @@ def print_report(
 ) -> None:
     """Render a three-section report with parsed data and detected findings."""
 
-    print("Section 1: Parsed Requirements")
-    for req_id, text in requirements.items():
-        print(f"  {req_id}: {text}")
+    print("=" * 30)
+    print("REQUIREMENTS ANALYSIS REPORT")
+    print("=" * 30)
 
-    print("\nSection 2: Detected Violations")
+    # Parsed Requirements
+    print("📋 PARSED REQUIREMENTS")
+    print("-" * 30)
     for req_id, text in requirements.items():
-        req_analysis = analysis[req_id]
-        clauses = req_analysis["clauses"]
-        clause_list = "; ".join(clauses)
-        print(f"  {req_id}: {text}")
-        print(f"    Focus clauses: {clause_list}")
-        violations = req_analysis["violations"]
+        print(f"• {req_id}: {text}")
+
+    # Detected Violations
+    print(f"\n⚠️  DETECTED VIOLATIONS")
+    print("-" * 30)
+    for req_id, text in requirements.items():
+        violations = analysis[req_id]["violations"]
+        print(f"📌 {req_id}: {text}")
+
         if not violations:
-            print("    No violations detected.")
+            print("   ✅ No violations detected\n")
             continue
-        for principle, details in violations.items():
-            print(f"    {principle}:")
-            for detail in details:
-                print(f"      - {detail}")
 
-    total_violations = sum(len(info["violations"]) for info in analysis.values())
-    print("\nSection 3: Summary")
-    print(f"  Requirements processed: {len(requirements)}")
-    print(
-        f"  Requirements with violations: {sum(bool(info['violations']) for info in analysis.values())}"
+        for principle, details in violations.items():
+            print(f"   🚨 {principle.title()}:")
+            for detail in details:
+                print(f"      → {detail}\n")
+
+    # Summary
+    print(f"\n📊 SUMMARY")
+    print("=" * 30)
+    requirements_count = len(requirements)
+    requirements_with_violations = sum(
+        1 for info in analysis.values() if info["violations"]
     )
-    print(f"  Principle categories flagged: {total_violations}")
+    total_violations = sum(len(info["violations"]) for info in analysis.values())
+
+    print(f"Total requirements processed: {requirements_count}")
+    print(f"Requirements with violations: {requirements_with_violations}")
+    print(f"Total violation categories: {total_violations}")
+
+    if requirements_with_violations == 0:
+        print("\n🎉 All requirements passed validation!")
+    else:
+        compliance_rate = (
+            (requirements_count - requirements_with_violations) / requirements_count
+        ) * 100
+        print(f"Compliance rate: {compliance_rate:.1f}%")
+
+    print("-" * 30)
 
 
 if __name__ == "__main__":
-    requirements = parse_requirements_yaml("requirements.yaml")
+    requirements = parse_requirements_yaml(
+        "requirements.yaml"
+    )  # (T1) include a method/function to parse the YAML content
     analysis_result = analyze_requirements(requirements)
     print_report(requirements, analysis_result)
