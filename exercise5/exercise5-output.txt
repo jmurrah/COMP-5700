@@ -1,0 +1,70 @@
+Analyzing... /SLI-KUBE-WORK/KubeSec-master/e5/K8S_ARTIFACTS/no.secu.present.yaml COUNT: 1
+-----
+Analyzing... /SLI-KUBE-WORK/KubeSec-master/e5/K8S_ARTIFACTS/bakis.rs.yaml COUNT: 2
+-----
+Analyzing... /SLI-KUBE-WORK/KubeSec-master/e5/K8S_ARTIFACTS/tp.nsp.dflt.yaml COUNT: 3
+-----
+Analyzing... /SLI-KUBE-WORK/KubeSec-master/e5/K8S_ARTIFACTS/host-ipc-pid-true.yaml COUNT: 4
+-----
+Analyzing... /SLI-KUBE-WORK/KubeSec-master/e5/K8S_ARTIFACTS/multi.doc.yaml COUNT: 5
+-----
+Analyzing... /SLI-KUBE-WORK/KubeSec-master/e5/K8S_ARTIFACTS/cap-module-ostk.yaml COUNT: 6
+-----
+Analyzing... /SLI-KUBE-WORK/KubeSec-master/e5/K8S_ARTIFACTS/deamonset1.yaml COUNT: 7
+-----
+Analyzing... /SLI-KUBE-WORK/KubeSec-master/e5/K8S_ARTIFACTS/present.deployment.default.yaml COUNT: 8
+-----
+Analyzing... /SLI-KUBE-WORK/KubeSec-master/e5/K8S_ARTIFACTS/tp_secu_context_miss.yaml COUNT: 9
+-----
+Analyzing... /SLI-KUBE-WORK/KubeSec-master/e5/K8S_ARTIFACTS/k8s.doc.network.yaml COUNT: 10
+-----
+Analyzing... /SLI-KUBE-WORK/KubeSec-master/e5/K8S_ARTIFACTS/nginx.present.yaml COUNT: 11
+-----
+Analyzing... /SLI-KUBE-WORK/KubeSec-master/e5/K8S_ARTIFACTS/cap.sys.yaml COUNT: 12
+-----
+Analyzing... /SLI-KUBE-WORK/KubeSec-master/e5/K8S_ARTIFACTS/tp.default.nspace.yaml COUNT: 13
+-----
+Analyzing... /SLI-KUBE-WORK/KubeSec-master/e5/K8S_ARTIFACTS/gcr.deployment.yaml COUNT: 14
+-----
+Analyzing... /SLI-KUBE-WORK/KubeSec-master/e5/K8S_ARTIFACTS/no.secu.nfs.yaml COUNT: 15
+-----
+Analyzing... /SLI-KUBE-WORK/KubeSec-master/e5/K8S_ARTIFACTS/php.roll.present.yaml COUNT: 16
+-----
+Analyzing... /SLI-KUBE-WORK/KubeSec-master/e5/K8S_ARTIFACTS/nginx.deployment.result.yaml COUNT: 17
+-----
+Analyzing... /SLI-KUBE-WORK/KubeSec-master/e5/K8S_ARTIFACTS/roll.present.demo.yaml COUNT: 18
+-----
+Analyzing... /SLI-KUBE-WORK/KubeSec-master/e5/K8S_ARTIFACTS/host-net-tp.yaml COUNT: 19
+-----
+Analyzing... /SLI-KUBE-WORK/KubeSec-master/e5/K8S_ARTIFACTS/helm.values.yaml COUNT: 20
+-----
+Analyzing... /SLI-KUBE-WORK/KubeSec-master/e5/K8S_ARTIFACTS/fp.glance.pv.yaml COUNT: 21
+-----
+Analyzing... /SLI-KUBE-WORK/KubeSec-master/e5/K8S_ARTIFACTS/docker.sock.yaml COUNT: 22
+-----
+Analyzing... /SLI-KUBE-WORK/KubeSec-master/e5/K8S_ARTIFACTS/sample-nfs-server.yaml COUNT: 23
+-----
+Analyzing... /SLI-KUBE-WORK/KubeSec-master/e5/K8S_ARTIFACTS/special.secret1.yaml COUNT: 24
+-----
+Analyzing... /SLI-KUBE-WORK/KubeSec-master/e5/K8S_ARTIFACTS/empty.yml COUNT: 25
+-----
+Analyzing... /SLI-KUBE-WORK/KubeSec-master/e5/K8S_ARTIFACTS/tp.seccomp.unconfined.yaml COUNT: 26
+-----
+Analyzing... /SLI-KUBE-WORK/KubeSec-master/e5/K8S_ARTIFACTS/roll.present.deploy.yaml COUNT: 27
+-----
+Analyzing... /SLI-KUBE-WORK/KubeSec-master/e5/K8S_ARTIFACTS/present.roll.yaml COUNT: 28
+-----
+Analyzing... /SLI-KUBE-WORK/KubeSec-master/e5/K8S_ARTIFACTS/present.varnish.yaml COUNT: 29
+-----
+Analyzing... /SLI-KUBE-WORK/KubeSec-master/e5/K8S_ARTIFACTS/present.default.ksql.yaml COUNT: 30
+-----
+Analyzing... /SLI-KUBE-WORK/KubeSec-master/e5/K8S_ARTIFACTS/test.sample.pod.yaml COUNT: 31
+-----
+Analyzing... /SLI-KUBE-WORK/KubeSec-master/e5/K8S_ARTIFACTS/charts.values.yaml COUNT: 32
+-----
+Analyzing... /SLI-KUBE-WORK/KubeSec-master/e5/K8S_ARTIFACTS/fp_secu_context_miss.yaml COUNT: 33
+-----
+Analyzing... /SLI-KUBE-WORK/KubeSec-master/e5/K8S_ARTIFACTS/dataimage.airflowimage.manifests.deployment.yaml COUNT: 34
+-----
+Analyzing... /SLI-KUBE-WORK/KubeSec-master/e5/K8S_ARTIFACTS/tp.host.net2.yaml COUNT: 35
+-----
