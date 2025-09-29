@@ -2,7 +2,7 @@ import ast
 from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 
 @dataclass
@@ -17,87 +17,70 @@ class DataFlowAnalyzer:
     """Extract simple data-flow information from a Python source file."""
 
     def __init__(self, file_name: str) -> None:
-        self.source = Path(file_name).read_text()
+        potential = Path(file_name)
+        if not potential.exists():
+            potential = Path(__file__).with_name(file_name)
+        self.source = potential.read_text()
+        self.file_path = potential
         self.tree = ast.parse(self.source)
-        self.assignment_map: dict[str, dict[str, ast.AST]] = {}
-        self.assignment_records: list[Record] = []
-        # self.operation_records: list[Record] = []
+        self.assignment_map: Dict[str, Dict[str, ast.AST]] = {}
+        self.assignment_records: List[Record] = []
 
     def parse_assignments(self) -> None:
-        """Collect assignment statements grouped by scope."""
         collector = _AssignmentCollector()
         collector.visit(self.tree)
-
         self.assignment_map = collector.assignment_map
         self.assignment_records = collector.records
 
-    # def extract_assignment_operations(
-    #     self, scope: Optional[str] = None
-    # ) -> None:
-    #     """Return assignments whose value is an operation (e.g., a binary op)."""
-    #     operations: list[Record] = []
-    #     for record in self.assignment_records:
-    #         if isinstance(record.value_node, ast.BinOp) and (scope is None or record.scope == scope):
-    #             operations.append(
-    #                 Record(
-    #                     scope=record.scope,
-    #                     target=record.target,
-    #                     value_node=record.value_node,
-    #                     expression=record.expression,
-    #                 )
-    #             )
-
-    #     self.operation_records = operations
-
-    def generate_flow(self) -> str:
-        """Produce a simple taint-style flow for the calculator example."""
-        module_assigns = self.assignment_map.get("module", {})
-        module_env: dict[str, any] = {}
-        for name, value_node in module_assigns.items():
+    def generate_flow(self, tracked_value: Any) -> str:
+        module_env: Dict[str, Any] = {}
+        for name, value_node in self.assignment_map.get("module", {}).items():
             try:
                 module_env[name] = self._evaluate_literal(value_node)
             except ValueError:
                 continue
 
-        val2_value = module_env.get("val2")
-        if val2_value is None:
-            raise ValueError("Could not resolve the initial value for val2")
+        origin_name = self._find_symbol_by_value(tracked_value, module_env)
+        if origin_name is None:
+            raise ValueError(
+                f"Could not resolve an assignment for value {tracked_value!r}"
+            )
 
-        flow_nodes: list[any] = [val2_value, "val2"]
-        func_def = self._get_function_def("simpleCalculator")
+        flow_nodes: List[Any] = [tracked_value, origin_name]
+        call_assign = self._find_call_using_name(origin_name)
+        call = (
+            call_assign.value
+            if isinstance(call_assign, ast.Assign)
+            and isinstance(call_assign.value, ast.Call)
+            else None
+        )
+        if call is None:
+            return self._format_flow(flow_nodes)
+
+        func_name = self._callable_name(call.func)
+        func_def = self._get_function_def(func_name) if func_name else None
         if func_def is None:
-            raise ValueError("Function simpleCalculator not found")
+            return self._format_flow(flow_nodes)
 
-        call_assign = self._find_function_call_assignment("simpleCalculator")
-        if call_assign is None or not isinstance(call_assign.value, ast.Call):
-            raise ValueError("Call to simpleCalculator not found")
-
-        arg_values = [
-            self._evaluate_expression(arg, module_env) for arg in call_assign.value.args
-        ]
+        arg_values = [self._evaluate_expression(arg, module_env) for arg in call.args]
         param_names = [arg.arg for arg in func_def.args.args]
         param_env = dict(zip(param_names, arg_values))
 
-        if param_env.get("v2") == val2_value:
-            flow_nodes.append("v2")
+        tainted_params = [
+            name for name in param_names if param_env.get(name) == tracked_value
+        ]
+        flow_nodes.extend(tainted_params)
 
-        local_env = dict(param_env)
-        res_value = self._evaluate_res_assignment(func_def, local_env)
-        if res_value is None:
-            raise ValueError("Could not resolve the value assigned to res")
+        tail = self._trace_function_flow(func_def, param_env, set(tainted_params))
+        flow_nodes.extend(tail)
 
-        flow_nodes.append("res")
-        flow_nodes.append(res_value)
+        return self._format_flow(flow_nodes)
 
-        return "->".join(str(node) for node in flow_nodes)
-
-    def run_pipeline(self) -> str:
-        """Execute the pipeline: parse -> extract -> assignment -> output."""
+    def run_pipeline(self, tracked_value: Any) -> str:
         self.parse_assignments()
-        # self.extract_assignment_operations()
-        return self.generate_flow()
+        return self.generate_flow(tracked_value)
 
-    def _evaluate_literal(self, node: ast.AST) -> any:
+    def _evaluate_literal(self, node: ast.AST) -> Any:
         if isinstance(node, ast.Constant):
             return node.value
         if isinstance(node, ast.UnaryOp) and isinstance(node.op, ast.USub):
@@ -107,7 +90,7 @@ class DataFlowAnalyzer:
             return tuple(self._evaluate_literal(elt) for elt in node.elts)
         raise ValueError(f"Unsupported literal node: {ast.dump(node)}")
 
-    def _evaluate_expression(self, node: ast.AST, env: dict[str, any]) -> any:
+    def _evaluate_expression(self, node: ast.AST, env: Dict[str, Any]) -> Any:
         if isinstance(node, ast.Name):
             if node.id in env:
                 return env[node.id]
@@ -128,7 +111,7 @@ class DataFlowAnalyzer:
             return self._evaluate_compare(node, env)
         raise ValueError(f"Unsupported expression node: {ast.dump(node)}")
 
-    def _evaluate_compare(self, node: ast.Compare, env: dict[str, any]) -> bool:
+    def _evaluate_compare(self, node: ast.Compare, env: Dict[str, Any]) -> bool:
         left = self._evaluate_expression(node.left, env)
         right = self._evaluate_expression(node.comparators[0], env)
         op = node.ops[0]
@@ -138,52 +121,120 @@ class DataFlowAnalyzer:
             return left != right
         raise ValueError(f"Unsupported comparison operator: {ast.dump(op)}")
 
-    def _evaluate_res_assignment(
-        self, func_def: ast.FunctionDef, env: dict[str, any]
-    ) -> Optional[any]:
+    def _find_symbol_by_value(
+        self, tracked_value: Any, env: Dict[str, Any]
+    ) -> Optional[str]:
+        for name, value in env.items():
+            if value == tracked_value:
+                return name
+        return None
+
+    def _find_call_using_name(self, name: str) -> Optional[ast.Assign]:
+        for node in self.tree.body:
+            assign = self._match_call_assignment(node)
+            if assign is not None and isinstance(assign.value, ast.Call):
+                if any(
+                    self._expression_contains_any(arg, {name})
+                    for arg in assign.value.args
+                ):
+                    return assign
+        return None
+
+    def _match_call_assignment(self, node: ast.AST) -> Optional[ast.Assign]:
+        if isinstance(node, ast.Assign) and isinstance(node.value, ast.Call):
+            return node
+        if isinstance(node, ast.If):
+            for stmt in node.body:
+                result = self._match_call_assignment(stmt)
+                if result is not None:
+                    return result
+        return None
+
+    def _callable_name(self, node: ast.AST) -> Optional[str]:
+        if isinstance(node, ast.Name):
+            return node.id
+        return None
+
+    def _trace_function_flow(
+        self,
+        func_def: ast.FunctionDef,
+        env: Dict[str, Any],
+        tainted: Set[str],
+    ) -> List[Any]:
+        local_env = dict(env)
+        tainted_names = set(tainted)
+        flow: List[Any] = []
         for stmt in func_def.body:
-            if isinstance(stmt, ast.Assign):
-                value = self._handle_assignment(stmt, env)
-                if value is not None:
-                    return value
-            elif isinstance(stmt, ast.If):
-                branch = (
-                    stmt.body
-                    if self._evaluate_expression(stmt.test, env)
-                    else stmt.orelse
+            additions, returned = self._process_function_statement(
+                stmt, local_env, tainted_names
+            )
+            if additions:
+                flow.extend(additions)
+            if returned:
+                break
+        return flow
+
+    def _process_function_statement(
+        self,
+        stmt: ast.stmt,
+        env: Dict[str, Any],
+        tainted: Set[str],
+    ) -> Tuple[List[Any], bool]:
+        if isinstance(stmt, ast.Assign):
+            additions = self._process_assignment(stmt, env, tainted)
+            return additions, False
+        if isinstance(stmt, ast.If):
+            branch = (
+                stmt.body if self._evaluate_expression(stmt.test, env) else stmt.orelse
+            )
+            branch_flow: List[Any] = []
+            for inner in branch:
+                additions, returned = self._process_function_statement(
+                    inner, env, tainted
                 )
-                for inner in branch:
-                    if isinstance(inner, ast.Assign):
-                        value = self._handle_assignment(inner, env)
-                        if value is not None:
-                            return value
-                    elif isinstance(inner, ast.Return):
-                        if inner.value is not None:
-                            return self._evaluate_expression(inner.value, env)
-                        return None
-            elif isinstance(stmt, ast.Return):
-                if stmt.value is not None:
-                    return self._evaluate_expression(stmt.value, env)
-                return None
-        return None
+                if additions:
+                    branch_flow.extend(additions)
+                if returned:
+                    return branch_flow, True
+            return branch_flow, False
+        if isinstance(stmt, ast.Return):
+            if stmt.value is None:
+                return [], True
+            if self._expression_contains_any(stmt.value, tainted):
+                result = self._evaluate_expression(stmt.value, env)
+                return [result], True
+            return [], True
+        return [], False
 
-    def _handle_assignment(
-        self, node: ast.Assign, env: dict[str, any]
-    ) -> Optional[any]:
-        target_names = [_target_to_name(target) for target in node.targets]
-        value = self._evaluate_expression(node.value, env)
-        for name in target_names:
-            if name is not None:
-                env[name] = value
-        if "res" in target_names and self._expression_contains_name(node.value, "v2"):
-            return value
-        return None
+    def _process_assignment(
+        self,
+        node: ast.Assign,
+        env: Dict[str, Any],
+        tainted: Set[str],
+    ) -> List[Any]:
+        additions: List[Any] = []
+        for target_node, value_node in _assignment_pairs(node.targets, node.value):
+            target_name = _target_to_name(target_node)
+            if target_name is None:
+                continue
+            value = self._evaluate_expression(value_node, env)
+            env[target_name] = value
+            if self._expression_contains_any(value_node, tainted):
+                if target_name not in tainted:
+                    tainted.add(target_name)
+                    additions.append(target_name)
+        return additions
 
-    def _expression_contains_name(self, node: ast.AST, target: str) -> bool:
+    def _expression_contains_any(self, node: ast.AST, targets: Set[str]) -> bool:
+        if not targets:
+            return False
         return any(
-            isinstance(child, ast.Name) and child.id == target
+            isinstance(child, ast.Name) and child.id in targets
             for child in ast.walk(node)
         )
+
+    def _format_flow(self, nodes: List[Any]) -> str:
+        return "->".join(str(node) for node in nodes)
 
     def _get_function_def(self, name: str) -> Optional[ast.FunctionDef]:
         for node in self.tree.body:
@@ -191,28 +242,11 @@ class DataFlowAnalyzer:
                 return node
         return None
 
-    def _find_function_call_assignment(self, func_name: str) -> Optional[ast.Assign]:
-        for node in self.tree.body:
-            if isinstance(node, ast.Assign) and isinstance(node.value, ast.Call):
-                call = node.value
-                if isinstance(call.func, ast.Name) and call.func.id == func_name:
-                    return node
-            if isinstance(node, ast.If):
-                for stmt in node.body:
-                    if isinstance(stmt, ast.Assign) and isinstance(
-                        stmt.value, ast.Call
-                    ):
-                        call = stmt.value
-                        if (
-                            isinstance(call.func, ast.Name)
-                            and call.func.id == func_name
-                        ):
-                            return stmt
-        return None
 
-
-def _assignment_pairs(targets: list[ast.expr], value: ast.AST) -> list[any]:
-    pairs: list[any] = []
+def _assignment_pairs(
+    targets: List[ast.expr], value: ast.AST
+) -> List[Tuple[ast.expr, ast.AST]]:
+    pairs: List[Tuple[ast.expr, ast.AST]] = []
     if (
         len(targets) == 1
         and isinstance(targets[0], ast.Tuple)
@@ -242,9 +276,9 @@ def _to_source(node: ast.AST) -> str:
 
 class _AssignmentCollector(ast.NodeVisitor):
     def __init__(self) -> None:
-        self.assignment_map: dict[str, dict[str, ast.AST]] = defaultdict(dict)
-        self.records: list[Record] = []
-        self.scope_stack: list[str] = ["module"]
+        self.assignment_map: Dict[str, Dict[str, ast.AST]] = defaultdict(dict)
+        self.records: List[Record] = []
+        self.scope_stack: List[str] = ["module"]
 
     def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
         self.scope_stack.append(node.name)
@@ -270,8 +304,8 @@ class _AssignmentCollector(ast.NodeVisitor):
 
 
 def main() -> None:
-    data_flow_analyzer = DataFlowAnalyzer("calc.py")
-    print(data_flow_analyzer.run_pipeline())
+    analyzer = DataFlowAnalyzer("calc.py")
+    print(analyzer.run_pipeline(-100))
 
 
 if __name__ == "__main__":
