@@ -1,16 +1,13 @@
+"""
+COMP-5700 Exercise 8: Data Flow Analysis (code)
+Author: Jacob Murrah
+Date: 10/14/2025
+"""
+
 import ast
 from collections import defaultdict
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set, Tuple
-
-
-@dataclass
-class Record:
-    scope: str
-    target: str
-    value_node: ast.AST
-    expression: str
 
 
 class DataFlowAnalyzer:
@@ -24,13 +21,11 @@ class DataFlowAnalyzer:
         self.file_path = potential
         self.tree = ast.parse(self.source)
         self.assignment_map: Dict[str, Dict[str, ast.AST]] = {}
-        self.assignment_records: List[Record] = []
 
     def parse_assignments(self) -> None:
         collector = _AssignmentCollector()
         collector.visit(self.tree)
         self.assignment_map = collector.assignment_map
-        self.assignment_records = collector.records
 
     def generate_flow(self, tracked_value: Any) -> str:
         module_env: Dict[str, Any] = {}
@@ -267,17 +262,9 @@ def _target_to_name(node: ast.AST) -> Optional[str]:
     return None
 
 
-def _to_source(node: ast.AST) -> str:
-    try:
-        return ast.unparse(node)
-    except AttributeError:
-        return ast.dump(node)
-
-
 class _AssignmentCollector(ast.NodeVisitor):
     def __init__(self) -> None:
         self.assignment_map: Dict[str, Dict[str, ast.AST]] = defaultdict(dict)
-        self.records: List[Record] = []
         self.scope_stack: List[str] = ["module"]
 
     def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
@@ -293,14 +280,6 @@ class _AssignmentCollector(ast.NodeVisitor):
             if target_name is None:
                 continue
             self.assignment_map[scope][target_name] = value_node
-            self.records.append(
-                Record(
-                    scope=scope,
-                    target=target_name,
-                    value_node=value_node,
-                    expression=_to_source(value_node),
-                )
-            )
 
 
 def main() -> None:
