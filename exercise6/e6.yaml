@@ -1,0 +1,15 @@
+# e6.yaml
+# Jacob Murrah COMP-5700 Exercise 6
+# NOTE: This is the final CORRECTED version of this file.
+min: 5
+max: 6
+---
+min: 10
+max: 11
+---
+min: -1
+max: 10
+config1: 1
+config2: 2
+config3: 30
+config4: 1
