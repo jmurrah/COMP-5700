@@ -2,6 +2,7 @@
 COMP-5700 Exercise 8: Data Flow Analysis (code)
 Author: Jacob Murrah
 Date: 10/14/2025
+NOTE: See data-structure-usage.txt for data structure usage details.
 """
 
 import ast
@@ -14,20 +15,42 @@ class DataFlowAnalyzer:
     """Extract simple data-flow information from a Python source file."""
 
     def __init__(self, file_name: str) -> None:
-        potential = Path(file_name)
-        if not potential.exists():
-            potential = Path(__file__).with_name(file_name)
-        self.source = potential.read_text()
-        self.file_path = potential
-        self.tree = ast.parse(self.source)
+        self.source = Path(file_name).read_text()
+        self.tree = ast.parse(self.source)  # parses the source code into an AST
         self.assignment_map: Dict[str, Dict[str, ast.AST]] = {}
 
+    # method to extract the parse tree
+    def get_parse_tree(self) -> ast.AST:
+        """Return the module AST (requirement: extract the parse tree)."""
+        return self.tree
+
+    # method to parse assignments for the parse tree
     def parse_assignments(self) -> None:
+        """Populate assignment map per scope (requirement: parse assignments)."""
         collector = _AssignmentCollector()
         collector.visit(self.tree)
         self.assignment_map = collector.assignment_map
 
+    # method to extract assignment operations
+    def extract_assignment_operations(
+        self, scope: Optional[str] = None
+    ) -> List[ast.Assign]:
+        """Collect assignments whose value is a binary operation (requirement)."""
+        assignments: List[ast.Assign] = []
+        for node in ast.walk(self.tree):
+            if isinstance(node, ast.Assign) and isinstance(node.value, ast.BinOp):
+                if scope is None:
+                    assignments.append(node)
+                else:
+                    parent_scope = _enclosing_scope_name(node, self.tree)
+                    if parent_scope == scope:
+                        assignments.append(node)
+
+        return assignments
+
+    # method to generate the flow
     def generate_flow(self, tracked_value: Any) -> str:
+        """Build the taint flow string (requirement: generate the flow)."""
         module_env: Dict[str, Any] = {}
         for name, value_node in self.assignment_map.get("module", {}).items():
             try:
@@ -72,7 +95,9 @@ class DataFlowAnalyzer:
         return self._format_flow(flow_nodes)
 
     def run_pipeline(self, tracked_value: Any) -> str:
+        self.get_parse_tree()
         self.parse_assignments()
+        self.extract_assignment_operations()
         return self.generate_flow(tracked_value)
 
     def _evaluate_literal(self, node: ast.AST) -> Any:
@@ -259,6 +284,24 @@ def _assignment_pairs(
 def _target_to_name(node: ast.AST) -> Optional[str]:
     if isinstance(node, ast.Name):
         return node.id
+    return None
+
+
+def _enclosing_scope_name(target: ast.AST, tree: ast.AST) -> Optional[str]:
+    parents: Dict[ast.AST, Optional[ast.AST]] = {tree: None}
+    stack: List[ast.AST] = [tree]
+    while stack:
+        current = stack.pop()
+        for child in ast.iter_child_nodes(current):
+            parents[child] = current
+            stack.append(child)
+
+    node: Optional[ast.AST] = target
+    while node in parents:
+        parent = parents[node]
+        if isinstance(parent, ast.FunctionDef):
+            return parent.name
+        node = parent
     return None
 
 
