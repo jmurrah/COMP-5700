@@ -1,0 +1,117 @@
+"""
+COMP-5700 Exercise 7: Static Code Analysis w/ GenAI (Results)
+Author: Jacob Murrah
+Date: 10/14/2025
+"""
+
+Summarized Results (Deliverable):
+- Total number of functions for all files: 185
+- Total number of statements for all files: 1829
+- Total number of imported libraries for all files: 74
+- Total number of variables for all files: 1715
+- Total number of lines of code for all files: 2503
+
+File: repo_name_downloader.py
+- Number of functions: 9
+- Number of statements: 115
+- Number of importanted libraries: 11
+- Number of variables: 80
+- Number of lines of code in total: 151
+
+File: vaccum-cleaner.py
+- Number of functions: 6
+- Number of statements: 100
+- Number of importanted libraries: 10
+- Number of variables: 89
+- Number of lines of code in total: 141
+
+File: _test_constants.py
+- Number of functions: 0
+- Number of statements: 97
+- Number of importanted libraries: 0
+- Number of variables: 97
+- Number of lines of code in total: 130
+
+File: _TestAggregate.py
+- Number of functions: 2
+- Number of statements: 26
+- Number of importanted libraries: 7
+- Number of variables: 32
+- Number of lines of code in total: 33
+
+File: _TestCrossScriptTaints.py
+- Number of functions: 19
+- Number of statements: 93
+- Number of importanted libraries: 5
+- Number of variables: 109
+- Number of lines of code in total: 118
+
+File: _TestEmpirical.py
+- Number of functions: 20
+- Number of statements: 69
+- Number of importanted libraries: 4
+- Number of variables: 73
+- Number of lines of code in total: 96
+
+File: _TestIntegration.py
+- Number of functions: 2
+- Number of statements: 14
+- Number of importanted libraries: 3
+- Number of variables: 12
+- Number of lines of code in total: 26
+
+File: _TestSmells.py
+- Number of functions: 35
+- Number of statements: 142
+- Number of importanted libraries: 4
+- Number of variables: 195
+- Number of lines of code in total: 183
+
+File: _TestTaintTracking.py
+- Number of functions: 20
+- Number of statements: 130
+- Number of importanted libraries: 6
+- Number of variables: 149
+- Number of lines of code in total: 158
+
+File: constants.py
+- Number of functions: 0
+- Number of statements: 102
+- Number of importanted libraries: 0
+- Number of variables: 102
+- Number of lines of code in total: 118
+
+File: exploration.py
+- Number of functions: 11
+- Number of statements: 97
+- Number of importanted libraries: 2
+- Number of variables: 80
+- Number of lines of code in total: 147
+
+File: graph.py
+- Number of functions: 6
+- Number of statements: 97
+- Number of importanted libraries: 3
+- Number of variables: 73
+- Number of lines of code in total: 156
+
+File: orchestra.py
+- Number of functions: 32
+- Number of statements: 430
+- Number of importanted libraries: 9
+- Number of variables: 384
+- Number of lines of code in total: 565
+
+File: parser.py
+- Number of functions: 17
+- Number of statements: 220
+- Number of importanted libraries: 3
+- Number of variables: 158
+- Number of lines of code in total: 300
+
+File: taintpup_main.py
+- Number of functions: 6
+- Number of statements: 97
+- Number of importanted libraries: 7
+- Number of variables: 82
+- Number of lines of code in total: 181

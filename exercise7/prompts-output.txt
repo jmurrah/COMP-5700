@@ -1,0 +1,255 @@
+"""
+COMP-5700 Exercise 7: Static Code Analysis w/ GenAI (Prompts)
+Author: Jacob Murrah
+Date: 10/14/2025
+"""
+---------------------------------------------------------------------------------------------------------
+
+Prompt 1: 
+NOTE: THIS SAME CRITERIA WILL PROVIDE FOR THE 3 PROMPTS FOLLOWING THIS. I WILL PROVIDE THE FILES IN BATCHES OF <= 5 python files. These files are directly from the TaintPup-master project folder. Wait for the file input after this.
+
+System Level Directive:
+You are an expert static code analyzer with full access to the TaintPup-master project folder.
+Your task is to compute and record key Python code metrics for every .py file found in this project. Analyze all Python files in the TaintPup-master folder and report the following metrics for each file: number of functions, number of statements, number of imported libraries, number of variables, and total lines of code. Then provide aggregate totals for all files combined.
+
+Analysis Instructions:
+For each Python file in the folder (and all subfolders):
+1. Count the following metrics:
+- Number of functions
+The total count of function definitions in the code.
+Includes:
+* Regular functions defined with def
+* Methods defined inside classes
+* Nested functions (functions defined inside other functions)
+* Lambda functions (anonymous functions)
+
+- Number of statements
+The total count of executable instructions that Python can interpret and execute.
+Includes:
+* Assignment statements (x = 5)
+* Function/class definitions (def, class)
+* Control flow statements (if, for, while, return, break, continue)
+* Import statements (import, from...import)
+* Expression statements (function calls, standalone expressions)
+* pass, raise, assert, with, try/except/finally
+Excludes:
+* Comments
+* Blank lines
+* Docstrings (unless they're used as expressions)
+
+- Number of imported libraries
+The total count of unique external modules or packages imported into the code.
+Includes:
+* Standard library modules (math, os, sys)
+* Third-party packages (numpy, pandas, requests)
+* Local/custom modules
+Counting rules:
+* Count each unique module name once, regardless of how many times it's imported
+* 'from module import something' as 1 library (the module)
+* Importing multiple items from the same module still counts as 1 library
+
+- Number of variables
+The total count of unique variable names defined in the code.
+Includes:
+* Local variables inside functions
+* Global variables
+* Function parameters
+* Class attributes
+* Loop variables
+Counting considerations:
+* Count each unique variable name once per scope
+* Same variable name in different scopes may be counted separately (depending on analysis method)
+* Typically counts initial assignments/definitions
+
+- Number of lines of code
+The total count of all physical lines in the source file.
+Includes:
+* Lines with executable code
+* Blank/empty lines
+* Comment lines
+* Docstring lines
+* Multi-line statements (each physical line counted)
+
+2. Summarize your findings:
+- List the results for each .py file separately.
+- After listing all files, include aggregate totals (sum of each metric across all files).
+
+Output Formatting:
+Provide me a copy and paste content for a text file. The results preserve the following structure exactly for each file:
+File: filename.py
+- Number of functions: X
+- Number of statements: X
+- Number of imported libraries: X
+- Number of variables: X
+- Number of lines of code in total: X
+
+At the top of the output content, update the “Summarized Results (Deliverable)” section with totals across all .py files. 
+NOTE: THIS CALCULATING RESULT WILL NOT BE PROVIDED UNTIL I START THE PROMPT WITH 'All Done, please provide me the summarized results.':
+Summarized Results (Deliverable):
+- Total number of functions for all files: X
+- Total number of statements for all files: X
+- Total number of imported libraries for all files: X
+- Total number of variables for all files: X
+- Total number of lines of code for all files: X
+
+NOTE: leave a single space between each file section like below:
+File: _TestAggregate.py
+- Number of functions:
+- Number of statements:
+- Number of importanted libraries:
+- Number of variables:
+- Number of lines of code in total:
+
+File: _TestCrossScriptTaints.py
+- Number of functions:
+- Number of statements:
+- Number of importanted libraries:
+- Number of variables:
+- Number of lines of code in total: 
+
+Prompt 1 Output:
+Understood. I am ready to begin the static code analysis. Please provide the first batch of Python files.
+
+---------------------------------------------------------------------------------------------------------
+
+Prompt 2:
+Remember to use the initial directions. Here is the first batch of 5 files.
+
+Prompt 2 Output:
+File: repo_name_downloader.py
+- Number of functions: 9
+- Number of statements: 115
+- Number of importanted libraries: 11
+- Number of variables: 80
+- Number of lines of code in total: 151
+
+File: vaccum-cleaner.py
+- Number of functions: 6
+- Number of statements: 100
+- Number of importanted libraries: 10
+- Number of variables: 89
+- Number of lines of code in total: 141
+
+File: _test_constants.py
+- Number of functions: 0
+- Number of statements: 97
+- Number of importanted libraries: 0
+- Number of variables: 97
+- Number of lines of code in total: 130
+
+File: _TestAggregate.py
+- Number of functions: 2
+- Number of statements: 26
+- Number of importanted libraries: 7
+- Number of variables: 32
+- Number of lines of code in total: 33
+
+File: _TestCrossScriptTaints.py
+- Number of functions: 19
+- Number of statements: 93
+- Number of importanted libraries: 5
+- Number of variables: 109
+- Number of lines of code in total: 118
+
+---------------------------------------------------------------------------------------------------------
+
+Prompt 3:
+Remember to use the initial directions. Here is the second batch of 5 files.
+
+Prompt 3 Output:
+File: _TestEmpirical.py
+- Number of functions: 20
+- Number of statements: 69
+- Number of importanted libraries: 4
+- Number of variables: 73
+- Number of lines of code in total: 96
+
+File: _TestIntegration.py
+- Number of functions: 2
+- Number of statements: 14
+- Number of importanted libraries: 3
+- Number of variables: 12
+- Number of lines of code in total: 26
+
+File: _TestSmells.py
+- Number of functions: 35
+- Number of statements: 142
+- Number of importanted libraries: 4
+- Number of variables: 195
+- Number of lines of code in total: 183
+
+File: _TestTaintTracking.py
+- Number of functions: 20
+- Number of statements: 130
+- Number of importanted libraries: 6
+- Number of variables: 149
+- Number of lines of code in total: 158
+
+File: constants.py
+- Number of functions: 0
+- Number of statements: 102
+- Number of importanted libraries: 0
+- Number of variables: 102
+- Number of lines of code in total: 118
+
+---------------------------------------------------------------------------------------------------------
+
+Prompt 3:
+Remember to use the initial directions. Here is the third and final batch of 5 files. 
+
+Prompt 3 Output:
+File: exploration.py
+- Number of functions: 11
+- Number of statements: 97
+- Number of importanted libraries: 2
+- Number of variables: 80
+- Number of lines of code in total: 147
+
+File: graph.py
+- Number of functions: 6
+- Number of statements: 97
+- Number of importanted libraries: 3
+- Number of variables: 73
+- Number of lines of code in total: 156
+
+File: orchestra.py
+- Number of functions: 32
+- Number of statements: 430
+- Number of importanted libraries: 9
+- Number of variables: 384
+- Number of lines of code in total: 565
+
+File: parser.py
+- Number of functions: 17
+- Number of statements: 220
+- Number of importanted libraries: 3
+- Number of variables: 158
+- Number of lines of code in total: 300
+
+File: taintpup_main.py
+- Number of functions: 6
+- Number of statements: 97
+- Number of importanted libraries: 7
+- Number of variables: 82
+- Number of lines of code in total: 181
+
+---------------------------------------------------------------------------------------------------------
+
+Prompt 4:
+All Done, please provide me the summarized results.
+
+The summarized result follow the below format:
+Summarized Results (Deliverable): 
+ - Total number of functions for all files: X 
+ - Total number of statements for all files: X 
+ - Total number of imported libraries for all files: X 
+ - Total number of variables for all files: X 
+ - Total number of lines of code for all files: X 
+
+Prompt 4 Output:
+Summarized Results (Deliverable):
+- Total number of functions for all files: 185
+- Total number of statements for all files: 1829
+- Total number of imported libraries for all files: 74
+- Total number of variables for all files: 1715
+- Total number of lines of code for all files: 2503
