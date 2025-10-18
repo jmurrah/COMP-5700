@@ -1,0 +1,36 @@
+#!/bin/sh
+
+# COMP-5700 Exercise 9: Git Hooks
+# Author: Jacob Murrah
+# Date: 10/20/2025
+
+BLUE='\033[0;34m'
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+NC='\033[0m'
+
+changed_python_files=$(git diff --cached --name-only --diff-filter=ACM | grep '\.py$' || true)
+if [ -z "$changed_python_files" ]; then
+  echo "No Python files staged for commit."
+  exit 0
+fi
+
+echo "${BLUE}Running Bandit on:${NC}"
+echo "${changed_python_files}\n"
+
+echo "${BLUE}Bandit Scan Results:${NC}"
+bandit -f txt $changed_python_files 2>&1 | tee /tmp/bandit_output
+
+high_severity_count=$(grep "High:" /tmp/bandit_output | awk '{print $2}' | tr -d '[:space:]' || echo "0")
+high_severity_count=${high_severity_count:-0}
+
+rm -f /tmp/bandit_output
+
+if [ "$high_severity_count" -gt 0 ] 2>/dev/null; then
+  echo "\n${RED}❌ Bandit detected HIGH severity issues — aborting commit.${NC}"
+  exit 1
+else
+  echo "\n${GREEN}✅ Bandit scan passed — no high severity issues found.${NC}"
+fi
+
+exit 0
