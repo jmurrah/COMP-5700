@@ -1,0 +1,45 @@
+u116:
+- file: a.txt
+  permission: '777'
+- file: b.py
+  permission: '777'
+- file: c.go
+  permission: '777'
+- file: d.yaml
+  permission: '777'
+- file: e.txt
+  permission: '777'
+- file: f.c
+  permission: '777'
+- file: g.cpp
+  permission: '777'
+u190:
+- file: a.txt
+  permission: '555'
+- file: b.py
+  permission: '555'
+- file: c.go
+  permission: '555'
+- file: d.yaml
+  permission: '555'
+- file: e.txt
+  permission: '555'
+- file: f.c
+  permission: '555'
+- file: g.cpp
+  permission: '555'
+u250:
+- file: a.txt
+  permission: '333'
+- file: b.py
+  permission: '333'
+- file: c.go
+  permission: '333'
+- file: d.yaml
+  permission: '333'
+- file: e.txt
+  permission: '333'
+- file: f.c
+  permission: '333'
+- file: g.cpp
+  permission: '333'
