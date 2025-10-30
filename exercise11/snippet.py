@@ -56,7 +56,7 @@ if __name__ == "__main__":
     simpleDiv(10, "4")  # type error exception
 
     mul(5, 4)  # happy path
-    mul("5", 4)  # type error exception
+    mul("5", "4")  # type error exception
 
     add(3, 7)  # happy path
     add("3", 7)  # type error exception

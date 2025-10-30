@@ -1,25 +1,31 @@
-2025-10-30 10:13:01 CDT-0500 INFO get_logger Starting log for the exercise 11 code snippet.
-2025-10-30 10:13:01 CDT-0500 INFO simpleDiv Arguments provided -> a:10, b:2
-2025-10-30 10:13:01 CDT-0500 INFO simpleDiv Arguments provided -> a:10, b:'4'
-2025-10-30 10:13:01 CDT-0500 ERROR simpleDiv Exception encountered with a=10, b='4'
+2025-10-30 12:03:46 CDT-0500 INFO get_logger Starting log for the exercise 11 code snippet.
+2025-10-30 12:03:46 CDT-0500 INFO simpleDiv Arguments provided -> a:10, b:2
+2025-10-30 12:03:46 CDT-0500 INFO simpleDiv Arguments provided -> a:10, b:'4'
+2025-10-30 12:03:46 CDT-0500 ERROR simpleDiv Exception encountered with a=10, b='4'
 Traceback (most recent call last):
   File "/mnt/c/Users/jacob/Projects/COMP-5700/exercise11/snippet.py", line 16, in simpleDiv
     return a / b
            ~~^~~
 TypeError: unsupported operand type(s) for /: 'int' and 'str'
-2025-10-30 10:13:01 CDT-0500 INFO mul Arguments provided -> a:5, b:4
-2025-10-30 10:13:01 CDT-0500 INFO mul Arguments provided -> a:'5', b:4
-2025-10-30 10:13:01 CDT-0500 INFO add Arguments provided -> a:3, b:7
-2025-10-30 10:13:01 CDT-0500 INFO add Arguments provided -> a:'3', b:7
-2025-10-30 10:13:01 CDT-0500 ERROR add Exception encountered with a='3', b=7
+2025-10-30 12:03:46 CDT-0500 INFO mul Arguments provided -> a:5, b:4
+2025-10-30 12:03:46 CDT-0500 INFO mul Arguments provided -> a:'5', b:'4'
+2025-10-30 12:03:46 CDT-0500 ERROR mul Exception encountered with a='5', b='4'
+Traceback (most recent call last):
+  File "/mnt/c/Users/jacob/Projects/COMP-5700/exercise11/snippet.py", line 26, in mul
+    return a * b
+           ~~^~~
+TypeError: can't multiply sequence by non-int of type 'str'
+2025-10-30 12:03:46 CDT-0500 INFO add Arguments provided -> a:3, b:7
+2025-10-30 12:03:46 CDT-0500 INFO add Arguments provided -> a:'3', b:7
+2025-10-30 12:03:46 CDT-0500 ERROR add Exception encountered with a='3', b=7
 Traceback (most recent call last):
   File "/mnt/c/Users/jacob/Projects/COMP-5700/exercise11/snippet.py", line 36, in add
     return a + b
            ~~^~~
 TypeError: can only concatenate str (not "int") to str
-2025-10-30 10:13:01 CDT-0500 INFO sub Arguments provided -> a:10, b:4
-2025-10-30 10:13:01 CDT-0500 INFO sub Arguments provided -> a:10, b:'4'
-2025-10-30 10:13:01 CDT-0500 ERROR sub Exception encountered with a=10, b='4'
+2025-10-30 12:03:46 CDT-0500 INFO sub Arguments provided -> a:10, b:4
+2025-10-30 12:03:46 CDT-0500 INFO sub Arguments provided -> a:10, b:'4'
+2025-10-30 12:03:46 CDT-0500 ERROR sub Exception encountered with a=10, b='4'
 Traceback (most recent call last):
   File "/mnt/c/Users/jacob/Projects/COMP-5700/exercise11/snippet.py", line 46, in sub
     return a - b
