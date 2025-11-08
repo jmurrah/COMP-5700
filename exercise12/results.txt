@@ -1,0 +1,24 @@
+----- 10×10-Fold Cross-Validation Summary: -----
+Accuracy  : 0.9478 ± 0.0162
+Precision : 0.7783 ± 0.0787
+Recall    : 0.8026 ± 0.0872
+F1        : 0.7863 ± 0.0607
+
+----- Feature Importances (aggregated): -----
+                  feature  importance
+                    WHOIS    0.249821
+     DIST_REMOTE_TCP_PORT    0.231241
+         SOURCE_APP_BYTES    0.148701
+               URL_LENGTH    0.089018
+NUMBER_SPECIAL_CHARACTERS    0.073571
+           CONTENT_LENGTH    0.052164
+                APP_BYTES    0.039969
+                  CHARSET    0.022398
+         REMOTE_APP_BYTES    0.020954
+                   SERVER    0.020787
+       REMOTE_APP_PACKETS    0.019532
+TCP_CONVERSATION_EXCHANGE    0.013640
+               REMOTE_IPS    0.009692
+       SOURCE_APP_PACKETS    0.004711
+              APP_PACKETS    0.003802
+          DNS_QUERY_TIMES    0.000000
