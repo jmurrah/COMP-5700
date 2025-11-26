@@ -30,7 +30,7 @@ CPPCHECK_FLAGS = OrderedDict(
             "win32A",
             "win32W",
             "win64",
-            "avr6",
+            "avr8",
             "elbrus-e1cp",
             "pic8",
             "pic8-enhanced",
